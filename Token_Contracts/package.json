@@ -1,0 +1,23 @@
+{
+  "name": "RGX-ERC20-tokens",
+  "version": "0.0.1",
+  "description": "The Rouge Project crowdfunding ERC20 tokens",
+  "main": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vdg/RGX-ERC20-tokens.git"
+  },
+  "keywords": [
+    "ethereum"
+  ],
+  "authors": [
+      "Simon de la Rouviere <simon.delarouviere@consensys.net>",
+      "Joseph Chow <joseph.chow@consensys.net>",
+      "ValentinD. Guillois <vdg@rouge.network>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vdg/RGX-ERC20-tokens/issues"
+  },
+  "homepage": "https://github.com/vdg/RGX-ERC20-tokens",
+}
