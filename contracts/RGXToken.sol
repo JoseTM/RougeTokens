@@ -1,7 +1,7 @@
 /*
 
-  Simple contract to implement ERC20 tokens for the crowdfunding of the Rouge Project.
-  They are based on StandardToken from https://github.com/ConsenSys/Tokens. Thanks to them.
+  Simple contract to implement ERC20 tokens for the crowdfunding of the Rouge Project (RGX tokens).
+  They are based on StandardToken from (https://github.com/ConsenSys/Tokens).
 
   Differences with standard ERC20 tokens :
 
@@ -17,9 +17,9 @@
 
 import "./StandardToken.sol";
 
-pragma solidity ^0.4.8;
+pragma solidity ^0.4.12;
 
-contract RGX is StandardToken {
+contract RGXToken is StandardToken {
 
     enum States {
         Closed,
@@ -56,13 +56,13 @@ contract RGX is StandardToken {
     string public name;
     string public symbol;
     uint8 public decimals = 0;
-    string public version = 'v0.6';
+    string public version = 'v0.7';
 
     /* RGX */
     address owner; 
     uint8 public discountMultiplier;
 
-    function RGX (
+    function RGXToken (
         uint8 _discountMultiplier,
         string _name,
         string _symbol,
@@ -82,6 +82,10 @@ contract RGX is StandardToken {
 
     function closeFunding() onlyBy(owner) {
       state = States.Closed;
+    }
+
+    function isFundingOpen() constant returns (bool yes) {
+      return state == States.Opened;
     }
 
     function withdraw() onlyBy(owner) {
