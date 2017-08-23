@@ -5,21 +5,21 @@ import "truffle/DeployedAddresses.sol";
 import "../contracts/RGXToken.sol";
 
 contract TestRGXToken {
-
-  function testInitialBalanceUsingDeployedContract() {
-    RGXToken rgx = RGXToken(DeployedAddresses.RGXToken());
-
-    uint expected = 1000;
-
-    Assert.equal(rgx.balanceOf(tx.origin), expected, "Owner should have 1000 RGXToken initially");
-  }
-
-  function testInitialBalanceWithNewRGXToken() {
-    RGXToken rgx = new RGXToken(10, 'RGX Token (x10 discount)', 'RGX10', 1000);
-
-    uint expected = 1000;
     
-    Assert.equal(rgx.balanceOf(this), expected, "Owner should have 10000 RGXToken initially");
-  }
+    function testInitialBalanceUsingDeployedContract() {
+        RGXToken rgx = RGXToken(DeployedAddresses.RGXToken());
+        
+        uint expected = 1000;
+        
+        Assert.equal(rgx.balanceOf(tx.origin), expected, "Owner should have 1000 RGXToken initially");
+    }
+    
+    function testInitialBalanceWithNewRGXToken() {
+        RGXToken rgx = new RGXToken('RGX Token (x8 discount)', 'RGX8', 888, 1503478645, 8);
+        
+        uint expected = 888;
+        
+        Assert.equal(rgx.balanceOf(this), expected, "Owner should have 888 RGXToken initially");
+    }
 
 }

@@ -3,12 +3,12 @@ var RGXToken = artifacts.require("./RGXToken.sol");
 contract('RGXToken', function(accounts) {
 
   var owner = accounts[0];
-  const initialBalance_owner = web3.eth.getBalance(owner);
-  console.log(web3.fromWei(initialBalance_owner).toString())
+  //const initialBalance_owner = web3.eth.getBalance(owner);
+  //console.log('owner eth balance = ' + web3.fromWei(initialBalance_owner).toString())
 
-  var user1 = accounts[2];
-  const initialBalance_user1 = web3.eth.getBalance(user1)
-  console.log(web3.fromWei(initialBalance_user1).toString())
+  var user1 = accounts[1];
+  //const initialBalance_user1 = web3.eth.getBalance(user1)
+  //console.log('user1 eth balance = ' + web3.fromWei(initialBalance_user1).toString())
 
   it("should put 1000 RGXToken in the owner account", function() {
     return RGXToken.deployed().then(function(instance) {
@@ -27,29 +27,35 @@ contract('RGXToken', function(accounts) {
     });
   });
   
-  it("has funding opened after owner call openFunding", function() {
+  it("has funding opened after owner set a starting timestamp in the past", function() {
+    var timestamp = 946684801; // Saturday, January 1, 2000 12:00:01 AM
+
     return RGXToken.deployed().then(function(instance) {
       RGX = instance;
-      return RGX.openFunding();
+      return RGX.timeFundingStart( timestamp ); 
     }).then(function() {
       return RGX.isFundingOpen.call();
     }).then(function(isOpen) {
-      assert.equal(isOpen, true, "funding is still closed after owner call openFunding");
+      assert.equal(isOpen, true, "funding is still closed after owner set fundingStart to now");
+      return RGX.fundingStart.call();
+    }).then(function(start) {
+      assert.equal(start, timestamp, "the funding starting timestamp was not correctly set up");
     });
   });
   
-  it("sending 10 finney should credit 10 RGXToken in the user account", function() {
+  it("sending 10 finney should credit them to the contract and move 10 RGXToken in the user account", function() {
     var RGX;
+
+    var amount = 10;
 
     var owner_RGX_start_balance;
     var user1_RGX_start_balance;
     var owner_RGX_end_balance;
     var user1_RGX_end_balance;
-    var amount = 10;
     
     return RGXToken.deployed().then(function(instance) {
       RGX = instance;
-      return RGX.openFunding();
+      return RGX.timeFundingStart( 946684801 ); // Saturday, January 1, 2000 12:00:01 AM
     }).then(function() {
       return RGX.balanceOf.call(owner);
     }).then(function(balance) {
@@ -57,16 +63,19 @@ contract('RGXToken', function(accounts) {
       return RGX.balanceOf.call(user1);
     }).then(function(balance) {
       user1_RGX_start_balance = balance.toNumber();
-      RGX.sendTransaction({from: user1, gas: 100000, value: web3.toWei(amount, "finney")});
+      RGX.sendTransaction({from: user1, gas: 100000, gasPrice: 100000000000, value: web3.toWei(amount, "finney")});
     }).then(function() {
       return RGX.balanceOf.call(owner);
     }).then(function(balance) {
       owner_RGX_end_balance = balance.toNumber();
+      assert.equal(owner_RGX_end_balance, owner_RGX_start_balance - amount, "Amount wasn't correctly taken from the owner");
       return RGX.balanceOf.call(user1);
     }).then(function(balance) {
       user1_RGX_end_balance = balance.toNumber();
-      assert.equal(owner_RGX_end_balance, owner_RGX_start_balance - amount, "Amount wasn't correctly taken from the owner (sender)");
       assert.equal(user1_RGX_end_balance, user1_RGX_start_balance + amount, "Amount wasn't correctly sent to the receiver");
+      return web3.fromWei(web3.eth.getBalance(RGX.address)) * 1000;
+    }).then(function(ether) {
+      assert.equal(ether, amount, "Ether wasn't credited to the contract");
     });
   });
 
