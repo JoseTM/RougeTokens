@@ -6,10 +6,13 @@ They are directly derived from ConsenSys/Tokens work.
 
 Differences with standard ERC20 tokens :
 
-   - The tokens can be bought by sending ether to the contract address
-     (the price is hardcoded 1 token = 1 finney (0.001 eth).
+   - The tokens can be bought by sending ether to the contract address (funding procedure).
+     The price is hardcoded: 1 token = 1 finney (0.001 eth).
 
-   - The contract implements two states (Opened & Closed) to let the owner start/stop the funding.
+   - The funding can only occur if the current date is superior to the startFunding parameter timestamp 
+     At anytime, the creator can change this token parameter, effectively closing the funding.
+
+   - The owner can also freeze part of his tokens to not be part of the funding procedure.
 
    - At the creation, a discountMultiplier is saved which can be used later on 
      by other contracts (eg to use the tokens as a voucher).
