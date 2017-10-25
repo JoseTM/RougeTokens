@@ -79,5 +79,41 @@ contract('RGXToken', function(accounts) {
     });
   });
 
+  it("can't send less than the minimum finney set by owner", function() {
+    var RGX;
+    
+    var minimum = 100;
+    var amount = 11;
+    
+    var user1_RGX_start_balance;
+    var user1_RGX_end_balance;
+    
+    var finney_start;
+    
+    return RGXToken.deployed().then(function(instance) {
+      RGX = instance;
+      finney_start = web3.fromWei(web3.eth.getBalance(RGX.address)) * 1000;
+      return RGX.timeFundingStart( 946684801 ); // Saturday, January 1, 2000 12:00:01 AM
+    }).then(function() {
+      return RGX.setMinimum( minimum ); 
+    }).then(function() {
+      return RGX.minContrib.call();
+    }).then(function(minContrib) {
+      assert.equal(minContrib, minimum, "Minimum contribution was not set");
+    }).then(function() {
+      return RGX.balanceOf.call(user1);
+    }).then(function(balance) {
+      user1_RGX_start_balance = balance.toNumber();
+      RGX.sendTransaction({from: user1, gas: 100000, gasPrice: 100000000000, value: web3.toWei(amount, "finney")});
+    }).then(function() {
+      return RGX.balanceOf.call(user1);
+    }).then(function(balance) {
+      user1_RGX_end_balance = balance.toNumber();
+      assert.equal(user1_RGX_end_balance, user1_RGX_start_balance, "Transfer was not blocked by the minimum");
+      return web3.fromWei(web3.eth.getBalance(RGX.address)) * 1000;
+    }).then(function(finney) {
+      assert.equal(finney - finney_start, 0, "Ether was wrongly credited to the contract");
+    });
+  });
 
 });

@@ -8,8 +8,9 @@ Differences with standard ERC20 tokens :
 
    - The tokens can be bought by sending ether to the contract address (funding procedure).
      The price is hardcoded: 1 token = 1 finney (0.001 eth).
+     A minimum contribution can be set by the owner.
 
-   - The funding can only occur if the current date is superior to the startFunding parameter timestamp 
+   - The funding can only occur if the current date is superior to the startFunding parameter timestamp.
      At anytime, the creator can change this token parameter, effectively closing the funding.
 
    - The owner can also freeze part of his tokens to not be part of the funding procedure.

@@ -7,8 +7,9 @@
 
    - The tokens can be bought by sending ether to the contract address (funding procedure).
      The price is hardcoded: 1 token = 1 finney (0.001 eth).
+     A minimum contribution can be set by the owner.
 
-   - The funding can only occur if the current date is superior to the startFunding parameter timestamp 
+   - The funding can only occur if the current date is superior to the startFunding parameter timestamp.
      At anytime, the creator can change this token parameter, effectively closing the funding.
 
    - The owner can also freeze part of his tokens to not be part of the funding procedure.
@@ -28,11 +29,12 @@ contract RGXToken is StandardToken {
     string public name;
     string public symbol;
     uint8 public decimals = 0;
-    string public version = 'v0.9';
+    string public version = 'v1';
     
     /* RGX */
     address owner; 
     uint public fundingStart;
+    uint256 public minContrib = 1;
     uint256 public frozenSupply = 0;
     uint8 public discountMultiplier;
     
@@ -51,6 +53,8 @@ contract RGXToken is StandardToken {
         require(msg.sender != owner);
         
         uint256 _value = msg.value / 1 finney;
+
+        require(_value >= minContrib); 
         
         require(balances[owner] >= (_value - frozenSupply) && _value > 0); 
         
@@ -85,6 +89,10 @@ contract RGXToken is StandardToken {
         frozenSupply = _value;
     }
     
+    function setMinimum(uint256 _value) onlyBy(owner) {
+        minContrib = _value;
+    }
+    
     function timeFundingStart(uint _fundingStart) onlyBy(owner) {
         fundingStart = _fundingStart;
     }
@@ -93,4 +101,8 @@ contract RGXToken is StandardToken {
         msg.sender.transfer(this.balance);
     }
     
+    function kill() onlyBy(owner) {
+        selfdestruct(owner);
+    }
+
 }
