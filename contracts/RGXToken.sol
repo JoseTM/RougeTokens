@@ -19,11 +19,11 @@
 
 */
 
-import "./StandardToken.sol";
+import "./EIP20.sol";
 
-pragma solidity ^0.4.12;
+pragma solidity ^0.4.18;
 
-contract RGXToken is StandardToken {
+contract RGXToken is EIP20 {
     
     /* ERC20 */
     string public name;
@@ -48,7 +48,7 @@ contract RGXToken is StandardToken {
         _;
     }
     
-    function () payable fundingOpen() { 
+    function () payable fundingOpen() public { 
 
         require(msg.sender != owner);
         
@@ -70,7 +70,7 @@ contract RGXToken is StandardToken {
                        uint256 _initialAmount,
                        uint _fundingStart,
                        uint8 _discountMultiplier
-                       ) {
+                       ) EIP20 (_initialAmount, _name, 0, _symbol) public {
         name = _name;
         symbol = _symbol;
         owner = msg.sender;
@@ -80,28 +80,28 @@ contract RGXToken is StandardToken {
         discountMultiplier = _discountMultiplier;
     }
     
-    function isFundingOpen() constant returns (bool yes) {
+    function isFundingOpen() constant public returns (bool yes) {
         return (now >= fundingStart);
     }
     
-    function freezeSupply(uint256 _value) onlyBy(owner) {
+    function freezeSupply(uint256 _value) onlyBy(owner) public {
         require(balances[owner] >= _value);
         frozenSupply = _value;
     }
     
-    function setMinimum(uint256 _value) onlyBy(owner) {
+    function setMinimum(uint256 _value) onlyBy(owner) public {
         minContrib = _value;
     }
     
-    function timeFundingStart(uint _fundingStart) onlyBy(owner) {
+    function timeFundingStart(uint _fundingStart) onlyBy(owner) public {
         fundingStart = _fundingStart;
     }
 
-    function withdraw() onlyBy(owner) {
-        msg.sender.transfer(this.balance);
+    function withdraw() onlyBy(owner) public {
+        msg.sender.transfer(address(this).balance);
     }
     
-    function kill() onlyBy(owner) {
+    function kill() onlyBy(owner) public {
         selfdestruct(owner);
     }
 

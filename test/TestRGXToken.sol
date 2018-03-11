@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.18;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
@@ -6,7 +6,7 @@ import "../contracts/RGXToken.sol";
 
 contract TestRGXToken {
     
-    function testInitialBalanceUsingDeployedContract() {
+    function testInitialBalanceUsingDeployedContract() public {
         RGXToken rgx = RGXToken(DeployedAddresses.RGXToken());
         
         uint expected = 1000;
@@ -14,7 +14,7 @@ contract TestRGXToken {
         Assert.equal(rgx.balanceOf(tx.origin), expected, "Owner should have 1000 RGXToken initially");
     }
     
-    function testInitialBalanceWithNewRGXToken() {
+    function testInitialBalanceWithNewRGXToken() public {
         RGXToken rgx = new RGXToken('RGX Token (x8 discount)', 'RGX8', 888, 1503478645, 8);
         
         uint expected = 888;
