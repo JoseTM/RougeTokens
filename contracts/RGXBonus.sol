@@ -50,13 +50,10 @@ contract RGXBonus is EIP20 {
         return (now < fundingEnd);
     }
     
-    function distribute(address _to, uint256 _value) onlyBy(owner) fundingOpen() public returns (bool success) {
-        require(_value > 0);
-        require(_to != owner);
+    function distribute(address _to, uint256 _value) onlyBy(owner) fundingOpen() public {
         totalSupply += _value;
         balances[_to] += _value;
         Transfer(owner, _to, _value);
-        return true;
     }
 
     function endFunding(uint _fundingEnd) onlyBy(owner) fundingOpen() public {
