@@ -15,7 +15,7 @@ contract TestRGXBonus {
     }
     
     function testInitialBalanceWithNewRGXBonus() public {
-        RGXBonus rgxb = new RGXBonus('RGXB (bounty/x11 discount)', 'RGXB', 1503478645, 11);
+        RGXBonus rgxb = new RGXBonus('RGXB (bounty/x11 discount)', 'RGXB', 1503478645, 11, 0);
         
         uint expected = 0;
         

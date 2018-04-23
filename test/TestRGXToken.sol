@@ -9,7 +9,7 @@ contract TestRGXToken {
     function testInitialBalanceUsingDeployedContract() public {
         RGXToken rgx = RGXToken(DeployedAddresses.RGXToken());
         
-        uint expected = 1000;
+        uint expected = 200000;
         
         Assert.equal(rgx.balanceOf(tx.origin), expected, "Owner should have 1000 RGXToken initially");
     }

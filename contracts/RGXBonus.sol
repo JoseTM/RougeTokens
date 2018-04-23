@@ -8,7 +8,7 @@
 
    - owner can distribute token until fundingEnd (non resersible);
    - discountMultiplier as in RGXToken is saved which can be used later on 
-     by other contracts (eg to use the tokens as a voucher).
+     by other contracts (eg to use the tokens as discount coupons/vouchers).
 
 */
 
@@ -21,7 +21,8 @@ contract RGXBonus is EIP20 {
     address owner; 
     uint public fundingEnd;
     uint8 public discountMultiplier;
-    string public version = 'v0.7';
+    uint8 public discountDecimal;
+    string public version = 'v2.1';
     
     modifier fundingOpen() {
         require(now < fundingEnd);
@@ -39,11 +40,13 @@ contract RGXBonus is EIP20 {
                        string _name,
                        string _symbol,
                        uint _fundingEnd,
-                       uint8 _discountMultiplier
+                       uint8 _discountMultiplier,
+                       uint8 _discountDecimal
                        ) EIP20 (0, _name, 0, _symbol) public {
         owner = msg.sender;
         fundingEnd = _fundingEnd;
         discountMultiplier = _discountMultiplier;
+        discountDecimal = _discountDecimal;
     }
     
     function isFundingOpen() constant public returns (bool yes) {

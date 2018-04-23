@@ -1,23 +1,18 @@
-#  The Rouge Project crowdfunding ERC20 tokens 
+#  The Rouge Project TGE smart contract and ERC20 tokens 
 
-This repo contains Solidity smart contract code to issue the Rouge Project ERC20 compliant crowdfunding tokens.
+Solidity smart contracts to be used before and during the Token Generation Event of the Rouge Project.
 
-They are directly derived from ConsenSys/Tokens work. 
+3 ERC20 smart contracts/tokens :
 
-Differences with standard ERC20 tokens :
+   - RGXToken (RGX20, RGX15, ...) which is sold during pre-sale and gives a discount during the TGE (contribution is reusable)
 
-   - The tokens can be bought by sending ether to the contract address (funding procedure).
-     The price is hardcoded: 1 token = 1 finney (0.001 eth).
-     A minimum contribution can be set by the owner.
+   - RGXBonus (RGXB, RGXA) which is distributed before TGE and gives a discount during the TGE
 
-   - The funding can only occur if the current date is superior to the startFunding parameter timestamp.
-     At anytime, the creator can change this token parameter, effectively closing the funding.
+   - RGEToken which is the main 'Rouge' token created during TGE and usable in the Rouge protocol
 
-   - The owner can also freeze part of his tokens to not be part of the funding procedure.
+And finally 1 smart contract () handling the TGE itself.
 
-   - At the creation, a discountMultiplier is saved which can be used later on 
-     by other contracts (eg to use the tokens as a voucher).
-
+RGXToken/RGXBonus are storing the future discount (discountMultiplier/discountDecimal) to be read by 
 
 ### Pull requests are welcome! Please keep standards discussions to the EIP repos.
 
