@@ -64,6 +64,7 @@ contract RGEToken is EIP20 {
         reserveY2 = 0;
     }
 
+    // later than end of TGE to let people withdraw (put a max?)
     function endCrowdsale(uint256 _unsold) onlyBy(crowdsale) public {
         reserveY2 += _unsold;
         Transfer(crowdsale, address(0), _unsold);

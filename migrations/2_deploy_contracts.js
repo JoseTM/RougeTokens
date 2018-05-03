@@ -1,6 +1,9 @@
 
+var RGXA = artifacts.require("./RGXBonus.sol");
 var RGXB = artifacts.require("./RGXBonus.sol");
+
 var RGX12 = artifacts.require("./RGXToken.sol");
+var RGX9 = artifacts.require("./RGXToken.sol");
 
 var TGE = artifacts.require("./RougeTGE.sol");
 var RGEToken = artifacts.require("./RGEToken.sol");
@@ -15,10 +18,13 @@ module.exports = async function(deployer) {
 
   await Promise.all([
 
-    // RGXB RGX12 endFunding set to 19 January, 2038 03:14:07 UT ( 2147483647 )
+    // RGX endFunding set to 19 January, 2038 03:14:07 UT ( 2147483647 )
 
+    deployer.deploy(RGXA, 'RGXA Test Token (x20 discount)', 'RGXA', 2147483647, 20, 0),
     deployer.deploy(RGXB, 'RGXB Test Token (x11 discount)', 'RGXB', 2147483647, 11, 0),
+
     deployer.deploy(RGX12, 'RGX12 Test Token (x12 discount)', 'RGX12', 200000, now, 12),
+    deployer.deploy(RGX9, 'RGX9 Test Token (x9 discount)', 'RGX9', 200000, now, 9),
 
     // TEST TGE => 1 hour crowdfounding starting from now
 
@@ -28,19 +34,23 @@ module.exports = async function(deployer) {
   ]);
 
   instances = await Promise.all([
+    RGXA.deployed(),
     RGXB.deployed(),
     RGX12.deployed(),
+    RGX9.deployed(),
     TGE.deployed(),
     RGEToken.deployed()
   ])
 
-  rgxb = instances[0];
-  rgx12 = instances[1];
-  tge = instances[2];
-  rge = instances[3];
+  rgxa = instances[0];
+  rgxb = instances[1];
+  rgx12 = instances[2];
+  rgx9 = instances[3];
+  tge = instances[4];
+  rge = instances[5];
 
   results = await Promise.all([
-    tge.init(rge.address, rgxb.address, rgx12.address),
+    tge.init(rge.address, rgxa.address, rgxb.address, rgx12.address, rgx9.address),
     rge.startCrowdsaleY0(tge.address)
   ]);
 

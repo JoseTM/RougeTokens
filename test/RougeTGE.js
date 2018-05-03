@@ -2,7 +2,7 @@
 var TGE = artifacts.require("./RougeTGE.sol");
 var RGEToken = artifacts.require("./RGEToken.sol");
 
-var RGXB = artifacts.require("./RGXBonus.sol");
+var RGXA = artifacts.require("./RGXBonus.sol");
 var RGX12 = artifacts.require("./RGXToken.sol");
 
 contract('RougeTGE', function(accounts) {
@@ -38,7 +38,7 @@ contract('RougeTGE', function(accounts) {
     let user_tokens_before = await tge.tokensOf.call(user);
     assert.equal(user_tokens_before.toNumber(), 0, "user has no tokens before contribution");
 
-    await tge.sendTransaction({from: user, gas: 70000, gasPrice: web3.toWei(1, "gwei"), value: web3.toWei(200, "finney")});
+    await tge.sendTransaction({from: user, gas: 100000, gasPrice: web3.toWei(1, "gwei"), value: web3.toWei(200, "finney")});
 
     let user_tokens_after = await tge.tokensOf.call(user);
     assert.equal(user_tokens_after.toNumber(), result, "user get tokens reserved in TGE contract after contribution");
@@ -46,7 +46,7 @@ contract('RougeTGE', function(accounts) {
     let user_balance_before = await rge.balanceOf.call(user);
     assert.equal(user_balance_before.toNumber(), 0, "null tokens balance before withdrawal");
 
-    await tge.setKYC(user, true);
+    await tge.toggleKYC(user, true);
     await tge.withdraw({from: user});
 
     let user_balance_after = await rge.balanceOf.call(user);
@@ -57,15 +57,15 @@ contract('RougeTGE', function(accounts) {
 
   });  
   
-  it("2 ETH contribution to TGE with 1000 RGXB", async function() {
+  it("2 ETH contribution to TGE with 1000 RGXA", async function() {
 
     var user = accounts[2];
     var rgx_amount = 1000; // RGX tokens number (1 token = 1 finney)
     var contribution = 2000; // in finney
-    var result =  Math.floor( contribution / 2 / 1000 * 500 * 1000000 / 0.076 ) * 11
+    var result =  Math.floor( contribution / 2 / 1000 * 500 * 1000000 / 0.076 ) * 20
                 + Math.floor( contribution / 2 / 1000 * 500 * 1000000 / 0.076 );
 
-    let rgx = await RGXB.deployed();
+    let rgx = await RGXA.deployed();
     let rge = await RGEToken.deployed();
     let tge = await TGE.deployed();
 
@@ -88,7 +88,7 @@ contract('RougeTGE', function(accounts) {
     let user_balance_before = await rge.balanceOf.call(user);
     assert.equal(user_balance_before.toNumber(), 0, "null tokens balance before withdrawal");
 
-    await tge.setKYC(user, true);
+    await tge.toggleKYC(user, true);
     await tge.withdraw({from: user});
 
     let user_balance_after = await rge.balanceOf.call(user);
@@ -130,7 +130,7 @@ contract('RougeTGE', function(accounts) {
     let user_balance_before = await rge.balanceOf.call(user);
     assert.equal(user_balance_before.toNumber(), 0, "null tokens balance before withdrawal");
 
-    await tge.setKYC(user, true);
+    await tge.toggleKYC(user, true);
     await tge.withdraw({from: user});
 
     let user_balance_after = await rge.balanceOf.call(user);

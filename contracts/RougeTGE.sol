@@ -8,7 +8,6 @@ pragma solidity ^0.4.18;
 
 contract RGX {
     function balanceOf(address _owner) public view returns (uint256 balance);
-    function discountMultiplier() public view returns (uint8 discount);
 }
 
 contract RGE {
@@ -18,7 +17,7 @@ contract RGE {
 
 contract RougeTGE {
     
-    string public version = 'v0.2';
+    string public version = 'v0.3';
     
     address owner; 
 
@@ -57,14 +56,16 @@ contract RougeTGE {
         return tokens[_who];
     }
 
-    uint256 public minFunding = 1; /* in finney */
-    uint256 public tokenPrice; /* in wei */
+    uint8 public minFunding = 1; /* in finney */
+    uint256 public total_distribution = 500000000 * 10**6; /* Total tokens to distribute during TGE (500m with 6 decimals) */
 
-    struct Bonus {
+    struct Sale {
         uint256 funding; // original contribution in finney
         uint256 used;    // already used with bonus contribution in finney
         uint256 tokens;  // RGE token attribution
     }
+
+    uint256 public tokenPrice; /* in wei */
 
     function RougeTGE (
                        uint _fundingStart,
@@ -74,98 +75,114 @@ contract RougeTGE {
         owner = msg.sender;
         fundingStart = _fundingStart;
         fundingEnd = _fundingEnd;
-        tokenPrice = _tokenPrice; /* in finney */
+        tokenPrice = _tokenPrice;
     }
     
     address rge; 
+
     address rgxa; 
     address rgxb; 
+
     address rgx20; 
     address rgx15; 
     address rgx12; 
+    address rgx9; 
+    address rgx8; 
 
     function init (
                    address _rge,
+                   address _rgxa,
                    address _rgxb,
-                   address _rgx12
+                   address _rgx12,
+                   address _rgx9
                    ) onlyBy(owner) public {
         rge = _rge;
-        rgxb = _rgxb;
+        rgxa = _rgxa;
+        rgxb = _rgxb; /* XXX TODO adding rgx8, rgx7, etc following the same method */
         rgx12 = _rgx12;
+        rgx9 = _rgx9;
     }
     
+    event Distribute(address indexed buyer, uint256 value);
+
     function () payable TGEOpen() public { 
 
         require(msg.sender != owner);
 
-        Bonus memory _bonus = Bonus({
+        Sale memory _sale = Sale({
             funding: msg.value / 1 finney, used: 0, tokens: 0
         });
 
-        require(_bonus.funding >= minFunding); 
+        require(_sale.funding >= minFunding); 
 
-        _bonus = _with_RGXBonus(_bonus, rgxb);
-        _bonus = _with_RGXToken(_bonus, rgx12);
+        /* distribution with RGX discounts */
+        
+        _sale = _with_RGXBonus(_sale, rgxa, 20, 1);
+        _sale = _with_RGXBonus(_sale, rgxb, 11, 1);
+
+        _sale = _with_RGXToken(_sale, rgx12, 12, 1);
+        _sale = _with_RGXToken(_sale, rgx9, 9, 1);
 
         /* standard tokens distribution */
         
-        if ( _bonus.funding > _bonus.used ) {
+        if ( _sale.funding > _sale.used ) {
 
-            uint256 _free = _bonus.funding - _bonus.used;
-            _bonus.used += _free;
-            _bonus.tokens += _free * 1 finney * 10**6 / tokenPrice;
-
+            uint256 _available = _sale.funding - _sale.used;
+            _sale.used += _available;
+            _sale.tokens += _available * 1 finney * 10**6 / tokenPrice;
+            
         }
+        
+        /* check if enough tokens and distribute tokens to buyer */
+        
+        require(total_distribution >= _sale.tokens); 
 
-        // check if enough tokens !
+        total_distribution -= _sale.tokens;
+        tokens[msg.sender] += _sale.tokens;
+        Distribute(msg.sender, _sale.tokens);
 
-        tokens[msg.sender] += _bonus.tokens;
     }
     
-    function _with_RGXBonus(Bonus _bonus, address _a) internal returns (Bonus _result) {
+    function _with_RGXBonus(Sale _sale, address _a, uint8 _multiplier, uint8 _divisor) internal returns (Sale _result) {
 
         RGX _rgx = RGX(_a);
 
         uint256 rgxBalance = _rgx.balanceOf(msg.sender);
 
-        if ( used[_rgx][msg.sender] < rgxBalance && _bonus.funding > _bonus.used ) {
+        if ( used[_a][msg.sender] < rgxBalance && _sale.funding > _sale.used ) {
 
-            uint256 _free = rgxBalance - used[_rgx][msg.sender];
+            uint256 _available = rgxBalance - used[_a][msg.sender];
 
-            if ( _free > _bonus.funding - _bonus.used ) {
-                _free = _bonus.funding - _bonus.used;
+            if ( _available > _sale.funding - _sale.used ) {
+                _available = _sale.funding - _sale.used;
             }
 
-            uint8 discountMultiplier = _rgx.discountMultiplier();
-
-            _bonus.used += _free;
-            _bonus.tokens += _free * 1 finney * 10**6 / tokenPrice * discountMultiplier;
-            used[_rgx][msg.sender] += _free;
+            _sale.used += _available;
+            _sale.tokens += _available * 1 finney * 10**6 / tokenPrice * _multiplier / _divisor;
+            used[_a][msg.sender] += _available;
         }
 
-        return _bonus;
+        return _sale;
     }
 
-    function _with_RGXToken(Bonus _bonus, address _a) internal returns (Bonus _result) {
+    function _with_RGXToken(Sale _sale, address _a, uint8 _multiplier, uint8 _divisor) internal returns (Sale _result) {
 
         RGX _rgx = RGX(_a);
 
         uint256 rgxBalance = _rgx.balanceOf(msg.sender);
 
-        if ( used[_rgx][msg.sender] < rgxBalance ) {
+        if ( used[_a][msg.sender] < rgxBalance ) {
 
-            uint256 _free = rgxBalance - used[_rgx][msg.sender];
+            uint256 _available = rgxBalance - used[_a][msg.sender];
 
-            uint8 discountMultiplier = _rgx.discountMultiplier() - 1;
-
-            _bonus.tokens += _free * 1 finney * 10**6 / tokenPrice * discountMultiplier;
-            used[_rgx][msg.sender] += _free;
+            _sale.tokens += _available * 1 finney * 10**6 / tokenPrice * (_multiplier - 1) / _divisor;
+            used[_a][msg.sender] += _available;
         }
 
-        return _bonus;
+        return _sale;
     }
 
-    function setKYC(address _who, bool _flag) onlyBy(owner) public {
+    function toggleKYC(address _who, bool _flag) onlyBy(owner) public {
         kyc[_who]= _flag;
     }
     
