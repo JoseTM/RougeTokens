@@ -64,7 +64,8 @@ contract RougeTGE {
     }
 
     uint8 public minFunding = 1; /* in finney */
-    uint256 public total_distribution = 500000000 * 10**6; /* Total RGE tokens to distribute during TGE (500m with 6 decimals) */
+    uint8 public decimals = 6;
+    uint256 public total_distribution = 500000000 * 10**uint(decimals); /* Total RGE tokens to distribute during TGE (500m with 6 decimals) */
 
     struct Sale {
         uint256 funding; // original contribution in finney
@@ -136,7 +137,7 @@ contract RougeTGE {
 
             uint256 _available = _sale.funding - _sale.used;
             _sale.used += _available;
-            _sale.tokens += _available * 1 finney * 10**6 / tokenPrice;
+            _sale.tokens += _available * 1 finney * 10**uint(decimals) / tokenPrice;
             
         }
         
@@ -165,7 +166,7 @@ contract RougeTGE {
             }
 
             _sale.used += _available;
-            _sale.tokens += _available * 1 finney * 10**6 / tokenPrice * _multiplier / _divisor;
+            _sale.tokens += _available * 1 finney * 10**uint(decimals) / tokenPrice * _multiplier / _divisor;
             used[_a][msg.sender] += _available;
         }
 
@@ -182,7 +183,7 @@ contract RougeTGE {
 
             uint256 _available = rgxBalance - used[_a][msg.sender];
 
-            _sale.tokens += _available * 1 finney * 10**6 / tokenPrice * (_multiplier - 1) / _divisor;
+            _sale.tokens += _available * 1 finney * 10**uint(decimals) / tokenPrice * (_multiplier - 1) / _divisor;
             used[_a][msg.sender] += _available;
         }
 

@@ -21,9 +21,9 @@ contract RGEToken is EIP20 {
     address public crowdsale;
     uint public endTGE;
     string public version = 'v0.2';
-    uint256 public totalSupply = 1000000000 * 10**6;
-    uint256 public   reserveY1 =  300000000 * 10**6;
-    uint256 public   reserveY2 =  200000000 * 10**6;
+    uint256 public totalSupply = 1000000000 * 10**uint(decimals);
+    uint256 public   reserveY1 =  300000000 * 10**uint(decimals);
+    uint256 public   reserveY2 =  200000000 * 10**uint(decimals);
 
     modifier onlyBy(address _account) {
         require(msg.sender == _account);
