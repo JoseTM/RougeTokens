@@ -21,7 +21,7 @@
 
 import "./EIP20.sol";
 
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
 contract RGXToken is EIP20 {
     
@@ -60,11 +60,11 @@ contract RGXToken is EIP20 {
         
         balances[owner] -= _value;
         balances[msg.sender] += _value;
-        Transfer(owner, msg.sender, _value);
+        emit Transfer(owner, msg.sender, _value);
         
     }
     
-    function RGXToken (
+    constructor(
                        string _name,
                        string _symbol,
                        uint256 _initialAmount,

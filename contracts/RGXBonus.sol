@@ -14,7 +14,7 @@
 
 import "./EIP20.sol";
 
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
 contract RGXBonus is EIP20 {
     
@@ -36,13 +36,13 @@ contract RGXBonus is EIP20 {
     
     function() public payable { }
     
-    function RGXBonus (
-                       string _name,
-                       string _symbol,
-                       uint _fundingEnd,
-                       uint8 _discountMultiplier,
-                       uint8 _discountDecimal
-                       ) EIP20 (0, _name, 0, _symbol) public {
+    constructor(
+                string _name,
+                string _symbol,
+                uint _fundingEnd,
+                uint8 _discountMultiplier,
+                uint8 _discountDecimal
+                ) EIP20 (0, _name, 0, _symbol) public {
         owner = msg.sender;
         fundingEnd = _fundingEnd;
         discountMultiplier = _discountMultiplier;
@@ -56,7 +56,7 @@ contract RGXBonus is EIP20 {
     function distribute(address _to, uint256 _value) onlyBy(owner) fundingOpen() public {
         totalSupply += _value;
         balances[_to] += _value;
-        Transfer(owner, _to, _value);
+        emit Transfer(owner, _to, _value);
     }
 
     function endFunding(uint _fundingEnd) onlyBy(owner) fundingOpen() public {

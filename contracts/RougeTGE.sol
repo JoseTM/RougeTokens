@@ -4,7 +4,7 @@
 
 */
 
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
 contract RGX {
     function balanceOf(address _owner) public view returns (uint256 balance);
@@ -17,7 +17,7 @@ contract RGE {
 
 contract RougeTGE {
     
-    string public version = 'v0.3';
+    string public version = 'v0.4';
     
     address owner; 
 
@@ -26,9 +26,15 @@ contract RougeTGE {
         _;
     }
 
+    bool public fundingActive = true;
+
+    function toggleFunding(bool _flag) onlyBy(owner) public {
+        fundingActive = _flag;
+    }
+
     uint public fundingStart;
     uint public fundingEnd;
-    
+
     modifier beforeTGE() {
         require(fundingStart > now);
         _;
@@ -36,6 +42,7 @@ contract RougeTGE {
 
     modifier TGEOpen() {
         require(fundingStart <= now && now < fundingEnd);
+        require(fundingActive);
         _;
     }
     
@@ -45,7 +52,7 @@ contract RougeTGE {
     }
 
     function isFundingOpen() constant public returns (bool yes) {
-        return(fundingStart <= now && now < fundingEnd);
+        return(fundingStart <= now && now < fundingEnd && fundingActive);
     }
 
     mapping (address => bool) public kyc;
@@ -57,21 +64,21 @@ contract RougeTGE {
     }
 
     uint8 public minFunding = 1; /* in finney */
-    uint256 public total_distribution = 500000000 * 10**6; /* Total tokens to distribute during TGE (500m with 6 decimals) */
+    uint256 public total_distribution = 500000000 * 10**6; /* Total RGE tokens to distribute during TGE (500m with 6 decimals) */
 
     struct Sale {
         uint256 funding; // original contribution in finney
         uint256 used;    // already used with bonus contribution in finney
-        uint256 tokens;  // RGE token attribution
+        uint256 tokens;  // RGE tokens distribution
     }
 
     uint256 public tokenPrice; /* in wei */
 
-    function RougeTGE (
-                       uint _fundingStart,
-                       uint _fundingEnd,
-                       uint _tokenPrice
-                       ) public {
+    constructor(
+                uint _fundingStart,
+                uint _fundingEnd,
+                uint _tokenPrice
+                ) public {
         owner = msg.sender;
         fundingStart = _fundingStart;
         fundingEnd = _fundingEnd;
@@ -113,7 +120,7 @@ contract RougeTGE {
             funding: msg.value / 1 finney, used: 0, tokens: 0
         });
 
-        require(_sale.funding >= minFunding); 
+        require(_sale.funding >= minFunding); // XXX TODO test
 
         /* distribution with RGX discounts */
         
@@ -139,7 +146,7 @@ contract RougeTGE {
 
         total_distribution -= _sale.tokens;
         tokens[msg.sender] += _sale.tokens;
-        Distribute(msg.sender, _sale.tokens);
+        emit Distribute(msg.sender, _sale.tokens);
 
     }
     
@@ -198,7 +205,6 @@ contract RougeTGE {
         RGE _rge = RGE(rge);
         
         if ( _rge.transfer(msg.sender, tokens[msg.sender]) ) {
-            // XXX to check 
             tokens[msg.sender] = 0;
             return true;
         } 
@@ -206,11 +212,6 @@ contract RougeTGE {
         return false;
         
     }
-    
-
-    /* function suspendTGE() onlyBy(owner) public {
-
-       }*/
     
     function withdrawFunding() onlyBy(owner) public {
         msg.sender.transfer(address(this).balance);
