@@ -37,6 +37,7 @@ contract RGEToken is EIP20 {
     }
     
     function startCrowdsaleY0(address _crowdsale) onlyBy(owner) public {
+        require(_crowdsale != address(0));
         require(crowdsale == address(0));
         require(now < endTGE);
         crowdsale = _crowdsale;
@@ -45,6 +46,7 @@ contract RGEToken is EIP20 {
     }
 
     function startCrowdsaleY1(address _crowdsale) onlyBy(owner) public {
+        require(_crowdsale != address(0));
         require(crowdsale == address(0));
         require(reserveY1 > 0);
         require(now >= endTGE + 31536000); /* Y+1 crowdsale can only start after a year */
@@ -55,6 +57,7 @@ contract RGEToken is EIP20 {
     }
 
     function startCrowdsaleY2(address _crowdsale) onlyBy(owner) public {
+        require(_crowdsale != address(0));
         require(crowdsale == address(0));
         require(reserveY2 > 0);
         require(now >= endTGE + 63072000); /* Y+2 crowdsale can only start after 2 years */
