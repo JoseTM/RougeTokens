@@ -71,6 +71,7 @@ contract RougeTGE {
         uint256 funding; // original contribution in finney
         uint256 used;    // already used with bonus contribution in finney
         uint256 tokens;  // RGE tokens distribution
+        bool presale;
     }
 
     uint256 public tokenPrice; /* in wei */
@@ -118,7 +119,7 @@ contract RougeTGE {
         require(msg.sender != owner);
 
         Sale memory _sale = Sale({
-            funding: msg.value / 1 finney, used: 0, tokens: 0
+            funding: msg.value / 1 finney, used: 0, tokens: 0, presale: false
         });
 
         require(_sale.funding >= minFunding); // XXX TODO test
@@ -175,6 +176,10 @@ contract RougeTGE {
 
     function _with_RGXToken(Sale _sale, address _a, uint8 _multiplier, uint8 _divisor) internal returns (Sale _result) {
 
+        if ( _sale.presale ) {
+            return _sale;
+        }
+        
         RGX _rgx = RGX(_a);
 
         uint256 rgxBalance = _rgx.balanceOf(msg.sender);
@@ -185,6 +190,7 @@ contract RougeTGE {
 
             _sale.tokens += _available * 1 finney * 10**uint(decimals) / tokenPrice * (_multiplier - 1) / _divisor;
             used[_a][msg.sender] += _available;
+            _sale.presale = true;
         }
 
         return _sale;
