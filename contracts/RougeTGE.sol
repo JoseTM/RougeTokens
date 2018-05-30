@@ -17,7 +17,7 @@ contract RGE {
 
 contract RougeTGE {
     
-    string public version = 'v0.4';
+    string public version = 'v1.0';
     
     address owner; 
 
@@ -91,25 +91,29 @@ contract RougeTGE {
 
     address rgxa; 
     address rgxb; 
+    address rgxd; 
 
     address rgx20; 
     address rgx15; 
     address rgx12; 
     address rgx9; 
     address rgx8; 
+    address rgx7; 
+    address rgx6; 
+    address rgx5; 
+    address rgx4; 
+    address rgx3; 
 
     function init (
                    address _rge,
-                   address _rgxa,
-                   address _rgxb,
-                   address _rgx12,
-                   address _rgx9
+                   address _rgxa, address _rgxb, address _rgxd,
+                   address _rgx20, address _rgx15, address _rgx12,
+                   address _rgx9, address _rgx8, address _rgx7, address _rgx6, address _rgx5, address _rgx4, address _rgx3
                    ) onlyBy(owner) public {
         rge = _rge;
-        rgxa = _rgxa;
-        rgxb = _rgxb; /* XXX TODO adding rgx8, rgx7, etc following the same method */
-        rgx12 = _rgx12;
-        rgx9 = _rgx9;
+        rgxa = _rgxa; rgxb = _rgxb; rgxd = _rgxd; 
+        rgx20 = _rgx20; rgx15 = _rgx15; rgx12 = _rgx12;
+        rgx9 = _rgx9; rgx8 = _rgx8; rgx7 = _rgx7; rgx6 = _rgx6; rgx5 = _rgx5; rgx4 = _rgx4; rgx3 = _rgx3;
     }
     
     event Distribute(address indexed buyer, uint256 value);
@@ -122,15 +126,24 @@ contract RougeTGE {
             funding: msg.value / 1 finney, used: 0, tokens: 0, presale: false
         });
 
-        require(_sale.funding >= minFunding); // XXX TODO test
+        require(_sale.funding >= minFunding);
 
         /* distribution with RGX discounts */
         
         _sale = _with_RGXBonus(_sale, rgxa, 20, 1);
         _sale = _with_RGXBonus(_sale, rgxb, 11, 1);
+        _sale = _with_RGXBonus(_sale, rgxd, 5, 4);
 
+        _sale = _with_RGXToken(_sale, rgx20, 20, 1);
+        _sale = _with_RGXToken(_sale, rgx15, 15, 1);
         _sale = _with_RGXToken(_sale, rgx12, 12, 1);
         _sale = _with_RGXToken(_sale, rgx9, 9, 1);
+        _sale = _with_RGXToken(_sale, rgx8, 8, 1);
+        _sale = _with_RGXToken(_sale, rgx7, 7, 1);
+        _sale = _with_RGXToken(_sale, rgx6, 6, 1);
+        _sale = _with_RGXToken(_sale, rgx5, 5, 1);
+        _sale = _with_RGXToken(_sale, rgx4, 4, 1);
+        _sale = _with_RGXToken(_sale, rgx3, 3, 1);
 
         /* standard tokens distribution */
         

@@ -2,8 +2,8 @@
 var TGE = artifacts.require("./RougeTGE.sol");
 var RGEToken = artifacts.require("./RGEToken.sol");
 
-var RGXA = artifacts.require("./RGXBonus.sol");
-var RGX12 = artifacts.require("./RGXToken.sol");
+var RGXB = artifacts.require("./RGXBonus.sol");
+var RGX9 = artifacts.require("./RGXToken.sol");
 
 contract('RougeTGE', function(accounts) {
 
@@ -57,17 +57,22 @@ contract('RougeTGE', function(accounts) {
 
   });  
   
-  it("2 ETH contribution to TGE with 1000 RGXA", async function() {
+  it("2 ETH contribution to TGE with 1000 RGXB", async function() {
 
-    var user = accounts[2];
+    var user = accounts[4];
     var rgx_amount = 1000; // RGX tokens number (1 token = 1 finney)
     var contribution = 2000; // in finney
     var expected =  Math.floor( contribution / 2 / 1000 * 500 * 1000000 / 0.076 ) * 20
-                + Math.floor( contribution / 2 / 1000 * 500 * 1000000 / 0.076 );
+                  + Math.floor( contribution / 2 / 1000 * 500 * 1000000 / 0.076 );
 
-    let rgx = await RGXA.deployed();
+    // 78,947
+    
+    let rgx = await RGXB.deployed();
     let rge = await RGEToken.deployed();
     let tge = await TGE.deployed();
+
+    let stored_symbol = await rgx.symbol.call();
+    assert.equal(stored_symbol, 'RGXB', "the discount token is not correct");
 
     let user_rgx_before = await rgx.balanceOf.call(user);
     assert.equal(user_rgx_before.toNumber(), 0, "user has no rgx before distribution");
@@ -80,7 +85,7 @@ contract('RougeTGE', function(accounts) {
     let user_tokens_before = await tge.tokensOf.call(user);
     assert.equal(user_tokens_before.toNumber(), 0, "user has no tokens before contribution");
 
-    await tge.sendTransaction({from: user, gas: 100000, gasPrice: web3.toWei(1, "gwei"), value: web3.toWei(contribution, "finney")});
+    await tge.sendTransaction({from: user, gas: 1000000, gasPrice: web3.toWei(1, "gwei"), value: web3.toWei(contribution, "finney")});
 
     let user_tokens_after = await tge.tokensOf.call(user);
     assert.equal(user_tokens_after.toNumber(), expected, "user get tokens reserved in TGE contract after contribution");
@@ -99,22 +104,28 @@ contract('RougeTGE', function(accounts) {
 
   });  
 
-  it("9 ETH contribution to TGE with 2000 RGX12", async function() {
+  it("9 ETH contribution to TGE with 2000 RGX9", async function() {
 
     var user = accounts[3];
     var rgx_amount = 2000; // RGX tokens number (1 token = 1 finney)
     var contribution = 9000; // in finney
-    var expected =  Math.floor( 2 * 500 * 1000000 / 0.076 ) * 11
-                + Math.floor( 9 * 500 * 1000000 / 0.076 );
+    var expected =  Math.floor( 2 * 500 * 1000000 / 0.076 ) * 19
+                  + Math.floor( 9 * 500 * 1000000 / 0.076 );
 
-    let rgx = await RGX12.deployed();
+    let rgx = await RGX9.deployed();
     let rge = await RGEToken.deployed();
     let tge = await TGE.deployed();
+
+    let stored_symbol = await rgx.symbol.call();
+    assert.equal(stored_symbol, 'RGX9', "the discount token is not correct");
 
     let user_rgx_before = await rgx.balanceOf.call(user);
     assert.equal(user_rgx_before.toNumber(), 0, "user has no rgx before distribution");
 
-    await rgx.sendTransaction({from: user, gas: 100000, gasPrice: web3.toWei(1, "gwei"), value: web3.toWei(rgx_amount, "finney")});
+    let user_balance_before = await rge.balanceOf.call(user);
+    assert.equal(user_balance_before.toNumber(), 0, "null tokens balance before distribution/withdrawal");
+
+    await rgx.sendTransaction({from: user, gas: 1000000, gasPrice: web3.toWei(1, "gwei"), value: web3.toWei(rgx_amount, "finney")});
 
     let user_rgx_after = await rgx.balanceOf.call(user);
     assert.equal(user_rgx_after.toNumber(), rgx_amount, "user has rgx after distribution");
@@ -126,9 +137,6 @@ contract('RougeTGE', function(accounts) {
 
     let user_tokens_after = await tge.tokensOf.call(user);
     assert.equal(user_tokens_after.toNumber(), expected, "user get tokens reserved in TGE contract after contribution");
-
-    let user_balance_before = await rge.balanceOf.call(user);
-    assert.equal(user_balance_before.toNumber(), 0, "null tokens balance before withdrawal");
 
     await tge.toggleKYC(user, true);
     await tge.withdraw({from: user});
