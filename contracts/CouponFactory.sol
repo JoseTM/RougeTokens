@@ -29,7 +29,7 @@ contract MinimumCouponCampaign {
     }
 
     function test() public pure returns (string _result) {
-        return "I'm a DUMMY test coupon campaign";
+        return "PASS DUMMY";
     }    
 
     function letsBurn(uint256 _value) onlyBy(issuer) public {
@@ -77,8 +77,8 @@ contract CouponFactory {
         _;
     }
 
-    function justTest () public {
-        result = 'PASS';
+    function justTest (string _s) public {
+        result = _s;
     }
 
     event NewCampaign(address issuer, address campaign, uint32 _issuance);
@@ -95,9 +95,11 @@ contract CouponFactory {
 
         emit Test(this);
 
+        string memory s = c.test();
+        
         // contracts.push(c); 
         
-        justTest();
+        justTest(s);
 
         // require(false);
         

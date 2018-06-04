@@ -17,7 +17,7 @@ contract RGE {
 
 contract RougeTGE {
     
-    string public version = 'v1.0';
+    string public version = 'v1.1';
     
     address owner; 
 
@@ -213,6 +213,11 @@ contract RougeTGE {
         kyc[_who]= _flag;
     }
     
+    function revertAML(address _who) onlyBy(owner) public {
+        total_distribution += tokens[_who];
+        tokens[_who] = 0;
+    }
+
     function withdraw() public returns (bool success) {
 
         require(msg.sender != owner); 
