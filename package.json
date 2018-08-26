@@ -1,14 +1,17 @@
 {
-  "name": "RGX-ERC20-tokens",
+  "name": "RougeTokens",
   "version": "0.3.2",
-  "description": "The Rouge Project crowdfunding ERC20 tokens",
+  "description": "The Rouge Project token (RGE) and TGE contracts",
   "main": "",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TheRougeProject/RougeTokens.git"
   },
   "keywords": [
-    "ethereum"
+    "ethereum",
+    "coupon",
+    "voucher",
+    "ticket"
   ],
   "authors": [
       "Simon de la Rouviere <simon.delarouviere@consensys.net>",
