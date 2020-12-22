@@ -15,7 +15,7 @@ var RGX4 = artifacts.require("./RGXToken.sol");
 var RGX3 = artifacts.require("./RGXToken.sol");
 
 var TGE = artifacts.require("./RougeTGE.sol");
-var RGEToken = artifacts.require("./RGEToken.sol");
+var CANToken = artifacts.require("./CANToken.sol");
 
 var Factory = artifacts.require("./CouponFactory.sol");
 
@@ -50,7 +50,7 @@ module.exports = async function(deployer) {
     // TEST TGE => 1 hour crowdfounding starting from now
 
     deployer.deploy(TGE, now, now+3600, price),
-    deployer.deploy(RGEToken, now+3600),
+    deployer.deploy(CANToken, now+3600),
 
     deployer.deploy(Factory)
 
@@ -71,7 +71,7 @@ module.exports = async function(deployer) {
     RGX4.deployed(),
     RGX3.deployed(),
     TGE.deployed(),
-    RGEToken.deployed(),
+    CANToken.deployed(),
     Factory.deployed()
   ])
 

@@ -14,14 +14,17 @@
     "ticket"
   ],
   "authors": [
-      "Simon de la Rouviere <simon.delarouviere@consensys.net>",
-      "Joseph Chow <joseph.chow@consensys.net>",
-      "Christophe Le Bars <clbg@rouge.network>",
-      "ValentinD. Guillois <vdg@rouge.network>"
+    "Simon de la Rouviere <simon.delarouviere@consensys.net>",
+    "Joseph Chow <joseph.chow@consensys.net>",
+    "Christophe Le Bars <clbg@rouge.network>",
+    "ValentinD. Guillois <vdg@rouge.network>"
   ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/TheRougeProject/RougeTokens/issues"
   },
   "homepage": "https://github.com/TheRougeProject/RougeTokens",
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^1.2.0"
+  }
 }
