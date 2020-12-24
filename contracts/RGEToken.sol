@@ -43,7 +43,7 @@ contract RGEToken is EIP20 {
         require(crowdsale == address(0));
         require(now < endTGE);
         crowdsale = _crowdsale;
-        balances[crowdsale] = totalSupply - reserveY1 - reserveY2;
+        balances[msg.sender] = totalSupply - reserveY1 - reserveY2;
         balances[address(0)] -= balances[crowdsale];
         emit Transfer(address(0), crowdsale, balances[crowdsale]);
     }
